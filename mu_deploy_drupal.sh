@@ -151,12 +151,12 @@ sleep 1
 # Deploying the staged updates from multidev to Dev
 echo "Press any key to continue..."
 read -n 1 -s
-echo "Making sure that new commits from Dev are merge to multidev $multidev..."
+echo "/nMaking sure that new commits from Dev are merge to multidev $multidev..."
 terminus multidev:merge-from-dev -- $sitename.$multidev
 echo "Updating the database..."
 terminus drush "$sitename.$multidev" -- updatedb -y
 echo "Done, updating the database!"
-echo "Merging commits from multidev $multidev to Dev..."
+echo "/nMerging commits from multidev $multidev to Dev..."
 terminus multidev:merge-to-dev $sitename.$multidev
 echo "Done!"
 echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
@@ -232,13 +232,14 @@ echo "If every pages passed, press any key to continue..."
 read -n 1 -s
 
 
+sleep 0.5
 # Deploying staged updates from Dev to Test
 # terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
 while true; do
     read -p "Do you want to sync the content from Live to Test? [y,n] " yn
     case $yn in
         [Yy]* ) echo "Syncing the content from Live to Test..."
-                terminus env:clone-content -- $sitename.live test --updatedb -y
+                terminus env:clone-content $sitename.live test --updatedb -y
                 echo "Done! Proceeding on the next step..."
                 break;;
         [Nn]* ) echo "Proceeding on the next step..."
@@ -246,7 +247,9 @@ while true; do
         * ) echo "Please answer yes(y) or no(n). ";;
     esac
 done
-echo "Deploying from Dev to Test..."
+
+sleep 0.5
+echo "\nDeploying from Dev to Test..."
 terminus env:deploy $sitename.test --cc --note="Pantheon Managed Updates: Deployed from $multidev" --updatedb
 echo "Done!"
 echo "Visit the site here: https://test-$sitename.pantheonsite.io"
@@ -270,19 +273,6 @@ output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml/" # Replace 
 # Define the YAML file name
 output_file="$output_directory/$sitename-test.yml"
 
-# Prompt the user to input labels and paths for tests
-declare -a labels
-declare -a paths
-
-while true; do
-    read -p "Enter a label for the page (or press Enter to finish): " label
-    if [ -z "$label" ]; then
-        break
-    fi
-    read -p "Enter the path for the page: " path
-    labels+=("$label")
-    paths+=("$path")
-done
 
 
 cat <<EOF > "$output_file"
@@ -321,9 +311,9 @@ echo "If every pages passed, press any key to continue..."
 read -n 1 -s
 
 
-
+sleep 0.5
 # Deploying staged updates from Test to Live
-echo "Deploying from Test to Live..."
+echo "\nDeploying from Test to Live..."
 terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deploying from $multidev" --updatedb
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
@@ -346,19 +336,6 @@ output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml/" # Replace 
 # Define the YAML file name
 output_file="$output_directory/$sitename-live.yml"
 
-# Prompt the user to input labels and paths for tests
-declare -a labels
-declare -a paths
-
-while true; do
-    read -p "Enter a label for the page (or press Enter to finish): " label
-    if [ -z "$label" ]; then
-        break
-    fi
-    read -p "Enter the path for the page: " path
-    labels+=("$label")
-    paths+=("$path")
-done
 
 
 cat <<EOF > "$output_file"
@@ -395,6 +372,5 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-live.yml # Replace thi
 sleep 1.5
 echo "If every pages are pass, press any key to continue..."
 read -n 1 -s
+sleep 1
 exit
-
-

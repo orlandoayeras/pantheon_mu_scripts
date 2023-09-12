@@ -146,7 +146,7 @@ sleep 1
 
 
 # Deploying the staged updates from multidev to Dev
-echo "Press any key to continue..."
+echo "Press any key to continue with the deployment..."
 read -n 1 -s
 echo "Making sure that new commits from Dev are merge to multidev $multidev..."
 terminus multidev:merge-from-dev -- $sitename.$multidev
@@ -160,8 +160,6 @@ echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
 echo "Press any key to continue..."
 read -n 1 -s
 
-echo "Please type-in the machine name of the Pantheon site: "
-read sitename
 
 
 # CREATING A VRT YAML FILE FOR SNPD AGAINST DEV
@@ -236,7 +234,7 @@ while true; do
     read -p "Do you want to sync the content from Live to Test? [y,n] " yn
     case $yn in
         [Yy]* ) echo "Syncing the content from Live to Test..."
-                terminus env:clone-content -- $sitename.live test -y
+                terminus env:clone-content $sitename.live test -y
                 terminus wp $sitename.test -- cache flush
                 echo "Done! Proceeding on the next step..."
                 break;;

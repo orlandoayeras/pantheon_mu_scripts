@@ -169,7 +169,7 @@ site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
 org_uuid=$(echo $site_info | jq -r '.organization')
 
-reference_url="https://$multidevd-$sitename.pantheonsite.io"
+reference_url="https://snpd-$cur_date-$sitename.pantheonsite.io"
 subject_url="https://dev-$sitename.pantheonsite.io"
 
 
@@ -222,7 +222,7 @@ echo "Generated values saved to $output_file"
 
 sleep 1.5
 # Run the VRT
-terminus env:wake $sitename.$multidevd
+terminus env:wake $sitename.snpd-$cur_date
 terminus env:wake $sitename.dev
 terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-dev.yml # Replace this with your own directory
 sleep 1.5
@@ -259,7 +259,7 @@ site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
 org_uuid=$(echo $site_info | jq -r '.organization')
 
-reference_url="https://$multidevt-$sitename.pantheonsite.io"
+reference_url="https://snpt-$cur_date-$sitename.pantheonsite.io"
 subject_url="https://test-$sitename.pantheonsite.io"
 
 
@@ -312,7 +312,7 @@ echo "Generated values saved to $output_file"
 
 sleep 1.5
 # Run the VRT
-terminus env:wake $sitename.$multidevt
+terminus env:wake $sitename.snpt-$cur_date
 terminus env:wake $sitename.test
 terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-test.yml  # Replace this with your own directory
 sleep 1.5
@@ -335,7 +335,7 @@ site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
 org_uuid=$(echo $site_info | jq -r '.organization')
 
-reference_url="https://$multidevl-$sitename.pantheonsite.io"
+reference_url="https://snpl-$cur_date-$sitename.pantheonsite.io"
 subject_url="https://live-$sitename.pantheonsite.io"
 
 
@@ -388,7 +388,7 @@ echo "Generated values saved to $output_file"
 
 sleep 1.5
 # Run the VRT
-terminus env:wake $sitename.$multidevl
+terminus env:wake $sitename.snpl-$cur_date
 terminus env:wake $sitename.live
 terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-live.yml # Replace this with your own directory
 sleep 1.5

@@ -157,7 +157,7 @@ terminus multidev:merge-to-dev $sitename.$multidev
 echo "Done!"
 echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
 # Prompt the user to press any key to continue
-echo "Press any key to continue..."
+echo "Press any key to continue VRT..."
 read -n 1 -s
 
 
@@ -393,9 +393,3 @@ sleep 1.5
 echo "If every pages are pass, press any key to continue..."
 read -n 1 -s
 exit
-
-
-# echo "Almost there! Flushing the caches..."
-# terminus remote:wp bighealth.dev -- cache flush
-# terminus env:clear-cache bighealth.dev
-# echo "Done! Please run the Manual VRT."

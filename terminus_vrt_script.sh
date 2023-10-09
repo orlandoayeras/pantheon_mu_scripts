@@ -8,12 +8,12 @@ site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
 org_uuid=$(echo $site_info | jq -r '.organization')
 
-reference_url="https://snpd-230911-$sitename.pantheonsite.io"
-subject_url="https://dev-$sitename.pantheonsite.io"
+reference_url="https://mu-230919-$sitename.pantheonsite.io"
+subject_url="https://live-$sitename.pantheonsite.io"
 
 
 # Define the directory where you want to save the YAML file
-output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml/"
+output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml"
 
 # Define the YAML file name
 output_file="$output_directory/$sitename.yml"
@@ -61,6 +61,6 @@ echo "Generated values saved to $output_file"
 
 sleep 1.5
 # Run the VRT
-terminus env:wake $sitename.snpd-230911
-terminus env:wake $sitename.dev
+terminus env:wake $sitename.live
+terminus env:wake $sitename.mu-230919
 terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename.yml

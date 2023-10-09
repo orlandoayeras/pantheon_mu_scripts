@@ -151,12 +151,12 @@ sleep 1
 # Deploying the staged updates from multidev to Dev
 echo "Press any key to continue..."
 read -n 1 -s
-echo "/nMaking sure that new commits from Dev are merge to multidev $multidev..."
+echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
 terminus multidev:merge-from-dev -- $sitename.$multidev
 echo "Updating the database..."
 terminus drush "$sitename.$multidev" -- updatedb -y
 echo "Done, updating the database!"
-echo "/nMerging commits from multidev $multidev to Dev..."
+echo "\nMerging commits from multidev $multidev to Dev..."
 terminus multidev:merge-to-dev $sitename.$multidev
 echo "Done!"
 echo "Visit the site here: https://dev-$sitename.pantheonsite.io"

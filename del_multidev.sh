@@ -42,6 +42,6 @@ done
 
 # Creating the multidev out of master branch and pulling the contents from Live
 # cur_date is the current date in the desired date
-cur_date=$(date +'%y%m%d')
+cur_date=$(TZ="PST8PDT" date +'%y%m%d')
 terminus multidev:create $sitename.live mu-$cur_date
 terminus env:clear-cache "$sitename.mu-$cur_date"

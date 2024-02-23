@@ -146,20 +146,39 @@ terminus multidev:create $sitename.live snpl-$cur_date
 echo "Created Live Snapshot Environment: snpl-$cur_date"
 sleep 1
 
+# Pre-deployment prompt for available commits ready to merge from DEV to multidev
+echo "Pull the site's dashboard. Please check for any available updates through the dashboard...."
+terminus dashboard:view --print $sitename.dev 
+echo "Dev's dashboard: https://admin.dashboard.pantheon.io/
+while true; do
+    read -p "Do you want to merge new commits from Dev to multidev [y,n] " yn
+    case $yn in
+        [Yy]* ) echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
+        terminus multidev:merge-from-dev -- $sitename.$multidev
+        echo "Updating the database..."
+        terminus drush "$sitename.$multidev" -- updatedb -y
+        echo "Done, updating the database!"
+        echo "\nMerging commits from multidev $multidev to Dev..."
+        terminus multidev:merge-to-dev $sitename.$multidev
+        echo "Updating the database..."
+        terminus drush "$sitename.$multidev" -- updatedb -y
+        terminus env:clear-cache "$sitename.dev"
+        echo "Done, updating the database!"
+        echo "Done!"
+        echo "Visit the site here: https://dev-$sitename.pantheonsite.io" 
+        break;;
+        [Nn]* ) echo "\nMerging commits from multidev $multidev to Dev..."
+        terminus multidev:merge-to-dev $sitename.$multidev
+        terminus env:clear-cache "$sitename.dev"
+        echo "Done!"
+        echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
+        exit;;
+        * ) echo "Please answer yes(y) or no(n). ";;
+    esac
+done
+sleep 1.5
 
 
-# Deploying the staged updates from multidev to Dev
-echo "Press any key to continue..."
-read -n 1 -s
-echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
-terminus multidev:merge-from-dev -- $sitename.$multidev
-echo "Updating the database..."
-terminus drush "$sitename.$multidev" -- updatedb -y
-echo "Done, updating the database!"
-echo "\nMerging commits from multidev $multidev to Dev..."
-terminus multidev:merge-to-dev $sitename.$multidev
-echo "Done!"
-echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
 # Prompt the user to press any key to continue
 echo "Press any key to continue..."
 read -n 1 -s

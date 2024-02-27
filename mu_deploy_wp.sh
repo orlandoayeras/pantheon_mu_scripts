@@ -181,7 +181,7 @@ sleep 1.5
 echo "Press any key to continue..."
 read -n 1 -s
 
-
+<<commentout
 # CREATING A VRT YAML FILE FOR SNPD AGAINST DEV
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -246,7 +246,7 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-dev.yml # Replace this
 sleep 1.5
 echo "If every pages passed, press any key to continue..."
 read -n 1 -s
-
+commentout
 
 # Deploying staged updates from Dev to Test
 # terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
@@ -271,7 +271,7 @@ echo "Visit the site here: https://test-$sitename.pantheonsite.io"
 echo "Press any key to continue to VRT..."
 read -n 1 -s
 
-
+<<commentout
 # CREATING A VRT YAML FILE FOR SNPT AGAINST TEST
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -336,7 +336,7 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-test.yml  # Replace th
 sleep 1.5
 echo "If every pages passed, press any key to continue..."
 read -n 1 -s
-
+commentout
 
 
 # Deploying staged updates from Test to Live
@@ -347,7 +347,7 @@ echo "Visit the site here: https://live-$sitename.pantheonsite.io"
 echo "Press any key to continue to VRT..."
 read -n 1 -s
 
-
+<<commentout
 # CREATING A VRT YAML FILE FOR SNPL AGAINST LIVE
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -412,4 +412,6 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-live.yml # Replace thi
 sleep 1.5
 echo "If every pages are pass, press any key to continue..."
 read -n 1 -s
+commentout
+
 exit

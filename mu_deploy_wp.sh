@@ -181,7 +181,7 @@ echo "Done!"
 echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
 
 # Prompt the user to press any key to continue
-echo "Press any key to continue..."
+echo "Press any key to continue on deployment..."
 read -n 1 -s
 
 : '
@@ -271,7 +271,7 @@ terminus env:deploy $sitename.test --cc --note="Pantheon Managed Updates: Deploy
 echo "Done!"
 echo "Visit the site here: https://test-$sitename.pantheonsite.io"
 # Prompt the user to press any key to continue
-echo "Press any key to continue to VRT..."
+echo "Press any key to continue on deployment.."
 read -n 1 -s
 
 : '
@@ -347,7 +347,8 @@ echo "Deploying from Test to Live..."
 terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deploying from $multidev"
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
-echo "Press any key to continue to VRT..."
+printf "Successfully deployed the updates to Live!\n"
+echo "Press any key to continue exit..."
 read -n 1 -s
 
 : '

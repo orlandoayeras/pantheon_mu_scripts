@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash 
 
 # Check if PMU-ops is loggend in the Terminus
 who_ami=$(terminus whoami)
@@ -19,7 +19,7 @@ clear
 # Pulling site's machine name
 printf "\nThis is a script for WP MU Deployment...\n"
 echo "Please type-in the machine name of the Pantheon site: "
-read -r sitename
+read sitename
 # echo "Please type-in the environment name of the source: "
 # read multidev
 
@@ -28,7 +28,7 @@ echo "Choose the naming convention of the Staging environment: "
 echo "1. mu-yymmdd (Manual Staging)"
 echo "2. spu-yymmdd (PMU Staging))"
 echo "3. autopilot (Autopilot Staging))"
-read -p -r "Enter the number of the staging environment (1, 2, or 3): " pattern_choice
+read -p "Enter the number of the staging environment (1, 2, or 3): " pattern_choice
 
 # Set the pattern based on user input
 if [ "$pattern_choice" == "1" ]; then
@@ -60,85 +60,87 @@ for multidev in $environments; do
 done
 
 while true; do
-    read -p -r "Do you want to proceed the deployment? [y,n] " yn
+    read -p "Do you want to proceed with the deployment? [y,n] " yn
     case $yn in
         [Yy]* ) echo "Proceeding the creation of Snapshot Environments...";
+                while true; do
+                    read -p "Are Snapshot Environments already created? [y,n] " yn
+                    case $yn in
+                        [Nn]* ) echo "Proceeding the creation of Snapshot Environments...";
+                                # CREATE SNAPSHOT ENVIRONMENTS FOR DEV, TEST, AND LIVE
+                                # Define the pattern for DEV multidev environment
+                                pattern1="^snpd-[0-9]{6}$"
+                                # The machine name will be put here $sitename for the multidev environments
+                                environments=$(terminus multidev:list "$sitename" --format=list --field=id)
+                                # Loop through the multidev environments
+                                for multidevd in $environments; do
+                                  # Check if the environment name matches the pattern1
+                                  if [[ $multidevd =~ $pattern1 ]]; then
+                                    # Delete the multidev environment
+                                    terminus multidev:delete --delete-branch "$sitename.$multidevd" -y
+                                    echo "Deleted Dev Snapshot Environment: $multidevd"
+                                    # Exit the loop since the correct environment has been found
+                                    break
+                                  fi
+                                done
+                                cur_date=$(TZ="PST8PDT" date +'%y%m%d')
+                                terminus multidev:create $sitename.dev snpd-$cur_date
+                                echo "Created Dev Snapshot Environment: snpd-$cur_date"
+                                sleep 1
+
+                                # Define the pattern for TEST multidev environment
+                                pattern1="^snpt-[0-9]{6}$"
+                                # The machine name will be put here $sitename for the multidev environments
+                                environments=$(terminus multidev:list "$sitename" --format=list --field=id)
+                                # Loop through the multidev environments
+                                for multidevt in $environments; do
+                                  # Check if the environment name matches the pattern1
+                                  if [[ $multidevt =~ $pattern1 ]]; then
+                                    # Delete the multidev environment
+                                    terminus multidev:delete --delete-branch "$sitename.$multidevt" -y
+                                    echo "Deleted Test Snapshot Environment: $multidevt"
+                                    # Exit the loop since the correct environment has been found
+                                    break
+                                  fi
+                                done
+                                terminus multidev:create $sitename.test snpt-$cur_date
+                                echo "Created Test Snapshot Environment: snpt-$cur_date"
+                                sleep 1
+
+
+                                # Define the pattern for LIVE multidev environment
+                                pattern1="^snpl-[0-9]{6}$"
+
+                                # The machine name will be put here $sitename for the multidev environments
+                                environments=$(terminus multidev:list "$sitename" --format=list --field=id)
+
+                                # Loop through the multidev environments
+                                for multidevl in $environments; do
+                                  # Check if the environment name matches the pattern1
+                                  if [[ $multidevl =~ $pattern1 ]]; then
+                                    # Delete the multidev environment
+                                    terminus multidev:delete --delete-branch "$sitename.$multidevl" -y
+                                    echo "Deleted Live Snapshot Environment: $multidevl"
+                                    # Exit the loop since the correct environment has been found
+                                    break
+                                  fi
+                                done
+                                terminus multidev:create $sitename.live snpl-$cur_date
+                                echo "Created Live Snapshot Environment: snpl-$cur_date"
+                                sleep 1
+                                break;;
+                        [Yy]* ) echo "Moving to deployment..."
+                                break;;
+                        * ) echo "Please answer yes[y] or no[n]. ";;
+                    esac
+                done
         break;;
         [Nn]* ) echo "Exiting..."
         exit;;
-        * ) echo "Please answer yes(y) or no(n). ";;
+        * ) echo "Please answer yes[y] or no[n]. ";;
     esac
 done
 sleep 1.5
-
-
-# CREATE SNAPSHOT ENVIRONMENTS FOR DEV, TEST, AND LIVE
-# Define the pattern for DEV multidev environment
-pattern1="^snpd-[0-9]{6}$"
-
-# The machine name will be put here $sitename for the multidev environments
-environments=$(terminus multidev:list "$sitename" --format=list --field=id)
-
-# Loop through the multidev environments
-for multidevd in $environments; do
-  # Check if the environment name matches the pattern1
-  if [[ $multidevd =~ $pattern1 ]]; then
-    # Delete the multidev environment
-    terminus multidev:delete --delete-branch "$sitename.$multidevd" -y
-    echo "Deleted Dev Snapshot Environment: $multidevd"
-    # Exit the loop since the correct environment has been found
-    break
-  fi
-done
-cur_date=$(TZ="PST8PDT" date +'%y%m%d')
-terminus multidev:create $sitename.dev snpd-$cur_date
-echo "Created Dev Snapshot Environment: snpd-$cur_date"
-sleep 1
-
-
-# Define the pattern for TEST multidev environment
-pattern1="^snpt-[0-9]{6}$"
-
-# The machine name will be put here $sitename for the multidev environments
-environments=$(terminus multidev:list "$sitename" --format=list --field=id)
-
-# Loop through the multidev environments
-for multidevt in $environments; do
-  # Check if the environment name matches the pattern1
-  if [[ $multidevt =~ $pattern1 ]]; then
-    # Delete the multidev environment
-    terminus multidev:delete --delete-branch "$sitename.$multidevt" -y
-    echo "Deleted Test Snapshot Environment: $multidevt"
-    # Exit the loop since the correct environment has been found
-    break
-  fi
-done
-terminus multidev:create $sitename.test snpt-$cur_date
-echo "Created Test Snapshot Environment: snpt-$cur_date"
-sleep 1
-
-
-# Define the pattern for LIVE multidev environment
-pattern1="^snpl-[0-9]{6}$"
-
-# The machine name will be put here $sitename for the multidev environments
-environments=$(terminus multidev:list "$sitename" --format=list --field=id)
-
-# Loop through the multidev environments
-for multidevl in $environments; do
-  # Check if the environment name matches the pattern1
-  if [[ $multidevl =~ $pattern1 ]]; then
-    # Delete the multidev environment
-    terminus multidev:delete --delete-branch "$sitename.$multidevl" -y
-    echo "Deleted Live Snapshot Environment: $multidevl"
-    # Exit the loop since the correct environment has been found
-    break
-  fi
-done
-terminus multidev:create $sitename.live snpl-$cur_date
-echo "Created Live Snapshot Environment: snpl-$cur_date"
-sleep 1
-
 
 
 # Pre-deployment prompt for available commits ready to merge from DEV to multidev
@@ -146,7 +148,7 @@ echo "Pulling the site's dashboard. Please check for any available updates throu
 terminus dashboard:view --print $sitename.dev
 # Prompt the user to press any key to continue
 echo "Press any key to continue..."
-read -n -r 1 -s
+read -n 1 -s
 
 
 echo "Waking up $multidev environment..."
@@ -154,11 +156,11 @@ terminus env:wake "$sitename.$multidev";
 echo "Done!"
 sleep 1
 while true; do
-    read -p -r "Do you want to merge new commits from Dev to multidev [y,n] " yn
+    read -p "Do you want to merge new commits from Dev to multidev [y,n] " yn
     case $yn in
         [Yy]* ) echo -e "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
         terminus multidev:merge-from-dev -- "$sitename.$multidev"
-        echo -e "\nMerging commits from multidev $multidev to Dev..."
+        echo "\nMerging commits from multidev $multidev to Dev..."
         terminus multidev:merge-to-dev "$sitename.$multidev"
         echo "Clearing caches..."
         terminus env:clear-cache "$sitename.dev"
@@ -172,7 +174,7 @@ while true; do
     esac
 done
 
-echo -e "\nMerging commits from multidev $multidev to Dev..."
+echo "\nMerging commits from multidev $multidev to Dev..."
 terminus multidev:merge-to-dev "$sitename.$multidev"
 terminus env:clear-cache "$sitename.dev"
 echo "Done!"
@@ -180,9 +182,9 @@ echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
 
 # Prompt the user to press any key to continue
 echo "Press any key to continue..."
-read -n -r 1 -s
+read -n 1 -s
 
-<<commentout
+: '
 # CREATING A VRT YAML FILE FOR SNPD AGAINST DEV
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -247,12 +249,12 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-dev.yml # Replace this
 sleep 1.5
 echo "If every pages passed, press any key to continue..."
 read -n 1 -s
-commentout
+'
 
 # Deploying staged updates from Dev to Test
 # terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
 while true; do
-    read -p -r "Do you want to sync the content from Live to Test? [y,n] " yn
+    read -p "Do you want to sync the content from Live to Test? [y,n] " yn
     case $yn in
         [Yy]* ) echo "Syncing the content from Live to Test..."
                 terminus env:clone-content $sitename.live test -y
@@ -261,7 +263,7 @@ while true; do
                 break;;
         [Nn]* ) echo "Proceeding on the next step..."
                 break;;
-        * ) echo "Please answer yes or no. ";;
+        * ) echo "Please answer yes[y] or no[n]. ";;
     esac
 done
 echo "Deploying from Dev to Test..."
@@ -272,7 +274,7 @@ echo "Visit the site here: https://test-$sitename.pantheonsite.io"
 echo "Press any key to continue to VRT..."
 read -n 1 -s
 
-<<commentout
+: '
 # CREATING A VRT YAML FILE FOR SNPT AGAINST TEST
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -337,7 +339,7 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-test.yml  # Replace th
 sleep 1.5
 echo "If every pages passed, press any key to continue..."
 read -n 1 -s
-commentout
+'
 
 
 # Deploying staged updates from Test to Live
@@ -346,9 +348,9 @@ terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deploy
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
 echo "Press any key to continue to VRT..."
-read -n -r 1 -s
+read -n 1 -s
 
-<<commentout
+: '
 # CREATING A VRT YAML FILE FOR SNPL AGAINST LIVE
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -413,6 +415,6 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-live.yml # Replace thi
 sleep 1.5
 echo "If every pages are pass, press any key to continue..."
 read -n 1 -s
-commentout
+'
 
 exit

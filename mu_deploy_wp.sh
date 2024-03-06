@@ -17,9 +17,9 @@ sleep 2
 clear
 
 # Pulling site's machine name
-echo "\nThis is a script for WP MU Deployment...\n"
+printf "\nThis is a script for WP MU Deployment...\n"
 echo "Please type-in the machine name of the Pantheon site: "
-read sitename
+read -r sitename
 # echo "Please type-in the environment name of the source: "
 # read multidev
 
@@ -28,7 +28,7 @@ echo "Choose the naming convention of the Staging environment: "
 echo "1. mu-yymmdd (Manual Staging)"
 echo "2. spu-yymmdd (PMU Staging))"
 echo "3. autopilot (Autopilot Staging))"
-read -p "Enter the number of the staging environment (1, 2, or 3): " pattern_choice
+read -p -r "Enter the number of the staging environment (1, 2, or 3): " pattern_choice
 
 # Set the pattern based on user input
 if [ "$pattern_choice" == "1" ]; then
@@ -60,7 +60,7 @@ for multidev in $environments; do
 done
 
 while true; do
-    read -p "Do you want to proceed the deployment? [y,n] " yn
+    read -p -r "Do you want to proceed the deployment? [y,n] " yn
     case $yn in
         [Yy]* ) echo "Waking up $multidev environment..."
         terminus env:wake "$sitename.$multidev";
@@ -88,7 +88,7 @@ for multidevd in $environments; do
   # Check if the environment name matches the pattern1
   if [[ $multidevd =~ $pattern1 ]]; then
     # Delete the multidev environment
-    terminus multidev:delete --delete-branch $sitename.$multidevd -y
+    terminus multidev:delete --delete-branch "$sitename.$multidevd" -y
     echo "Deleted Dev Snapshot Environment: $multidevd"
     # Exit the loop since the correct environment has been found
     break
@@ -111,7 +111,7 @@ for multidevt in $environments; do
   # Check if the environment name matches the pattern1
   if [[ $multidevt =~ $pattern1 ]]; then
     # Delete the multidev environment
-    terminus multidev:delete --delete-branch $sitename.$multidevt -y
+    terminus multidev:delete --delete-branch "$sitename.$multidevt" -y
     echo "Deleted Test Snapshot Environment: $multidevt"
     # Exit the loop since the correct environment has been found
     break
@@ -133,7 +133,7 @@ for multidevl in $environments; do
   # Check if the environment name matches the pattern1
   if [[ $multidevl =~ $pattern1 ]]; then
     # Delete the multidev environment
-    terminus multidev:delete --delete-branch $sitename.$multidevl -y
+    terminus multidev:delete --delete-branch "$sitename.$multidevl" -y
     echo "Deleted Live Snapshot Environment: $multidevl"
     # Exit the loop since the correct environment has been found
     break
@@ -146,40 +146,40 @@ sleep 1
 
 
 # Pre-deployment prompt for available commits ready to merge from DEV to multidev
-echo "Pull the site's dashboard. Please check for any available updates through the dashboard...."
-terminus dashboard:view --print $sitename.dev 
-echo "Dev's dashboard: https://admin.dashboard.pantheon.io/
+echo "Pulling the site's dashboard. Please check for any available updates through the dashboard...."
+terminus dashboard:view --print $sitename.dev
+# Prompt the user to press any key to continue
+echo "Press any key to continue..."
+read -n -r 1 -s
+
 while true; do
-    read -p "Do you want to merge new commits from Dev to multidev [y,n] " yn
+    read -p -r "Do you want to merge new commits from Dev to multidev [y,n] " yn
     case $yn in
-        [Yy]* ) echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
-        terminus multidev:merge-from-dev -- $sitename.$multidev
-        echo "Updating the database..."
-        terminus drush "$sitename.$multidev" -- updatedb -y
-        echo "Done, updating the database!"
-        echo "\nMerging commits from multidev $multidev to Dev..."
-        terminus multidev:merge-to-dev $sitename.$multidev
-        echo "Updating the database..."
-        terminus drush "$sitename.$multidev" -- updatedb -y
+        [Yy]* ) echo -e "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
+        terminus multidev:merge-from-dev -- "$sitename.$multidev"
+        echo -e "\nMerging commits from multidev $multidev to Dev..."
+        terminus multidev:merge-to-dev "$sitename.$multidev"
+        echo "Clearing caches..."
         terminus env:clear-cache "$sitename.dev"
-        echo "Done, updating the database!"
-        echo "Done!"
+        echo "Done, cleared the caches!"
         echo "Visit the site here: https://dev-$sitename.pantheonsite.io" 
         break;;
-        [Nn]* ) echo "\nMerging commits from multidev $multidev to Dev..."
-        terminus multidev:merge-to-dev $sitename.$multidev
-        terminus env:clear-cache "$sitename.dev"
-        echo "Done!"
-        echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
-        exit;;
-        * ) echo "Please answer yes(y) or no(n). ";;
+        [Nn]* ) echo "Proceeding on the next step..."
+        break;;
+        *) echo "Please answer yes or no. "
+        ;;
     esac
 done
-sleep 1.5
+
+echo -e "\nMerging commits from multidev $multidev to Dev..."
+terminus multidev:merge-to-dev "$sitename.$multidev"
+terminus env:clear-cache "$sitename.dev"
+echo "Done!"
+echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
 
 # Prompt the user to press any key to continue
 echo "Press any key to continue..."
-read -n 1 -s
+read -n -r 1 -s
 
 <<commentout
 # CREATING A VRT YAML FILE FOR SNPD AGAINST DEV
@@ -202,7 +202,7 @@ declare -a labels
 declare -a paths
 
 while true; do
-    read -p "Enter a label for the page (or press Enter to finish): " label
+    read -p -r "Enter a label for the page (or press Enter to finish): " label
     if [ -z "$label" ]; then
         break
     fi
@@ -251,7 +251,7 @@ commentout
 # Deploying staged updates from Dev to Test
 # terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
 while true; do
-    read -p "Do you want to sync the content from Live to Test? [y,n] " yn
+    read -p -r "Do you want to sync the content from Live to Test? [y,n] " yn
     case $yn in
         [Yy]* ) echo "Syncing the content from Live to Test..."
                 terminus env:clone-content $sitename.live test -y
@@ -260,7 +260,7 @@ while true; do
                 break;;
         [Nn]* ) echo "Proceeding on the next step..."
                 break;;
-        * ) echo "Please answer yes(y) or no(n). ";;
+        * ) echo "Please answer yes or no. ";;
     esac
 done
 echo "Deploying from Dev to Test..."
@@ -345,7 +345,7 @@ terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deploy
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
 echo "Press any key to continue to VRT..."
-read -n 1 -s
+read -n -r 1 -s
 
 <<commentout
 # CREATING A VRT YAML FILE FOR SNPL AGAINST LIVE

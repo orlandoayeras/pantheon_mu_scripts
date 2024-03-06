@@ -62,10 +62,7 @@ done
 while true; do
     read -p -r "Do you want to proceed the deployment? [y,n] " yn
     case $yn in
-        [Yy]* ) echo "Waking up $multidev environment..."
-        terminus env:wake "$sitename.$multidev";
-        echo "Done!"
-        sleep 1
+        [Yy]* ) echo "Proceeding the creation of Snapshot Environments...";
         break;;
         [Nn]* ) echo "Exiting..."
         exit;;
@@ -73,7 +70,6 @@ while true; do
     esac
 done
 sleep 1.5
-
 
 
 # CREATE SNAPSHOT ENVIRONMENTS FOR DEV, TEST, AND LIVE
@@ -152,6 +148,11 @@ terminus dashboard:view --print $sitename.dev
 echo "Press any key to continue..."
 read -n -r 1 -s
 
+
+echo "Waking up $multidev environment..."
+terminus env:wake "$sitename.$multidev";
+echo "Done!"
+sleep 1
 while true; do
     read -p -r "Do you want to merge new commits from Dev to multidev [y,n] " yn
     case $yn in

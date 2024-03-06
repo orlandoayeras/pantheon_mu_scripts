@@ -344,7 +344,7 @@ read -n 1 -s
 
 # Deploying staged updates from Test to Live
 echo "Deploying from Test to Live..."
-terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deploying from $multidev"
+terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deployed from $multidev"
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
 printf "Successfully deployed the updates to Live!\n"

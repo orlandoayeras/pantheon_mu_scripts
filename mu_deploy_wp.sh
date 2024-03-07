@@ -295,7 +295,7 @@ done
 num_packages=${#packages[@]}
 pkg_message="Plugins/Themes ($num_packages):"
 for package in "${packages[@]}"; do
-    pkg_message+="\n- $package"
+    pkg_message+=$'\n'"- $package"
 done
 sleep 0.5
 

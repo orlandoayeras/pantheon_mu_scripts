@@ -253,7 +253,7 @@ echo "If every pages passed, press any key to continue..."
 read -n 1 -s
 '
 
-# Deploying staged updates from Dev to Test
+# Deploying staged updates from Dev to Test Step #1
 # terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
 while true; do
     read -p "Do you want to sync the content from Live to Test? [y,n] " yn
@@ -268,8 +268,37 @@ while true; do
         * ) echo "Please answer yes[y] or no[n]. ";;
     esac
 done
-echo "Deploying from Dev to Test..."
-terminus env:deploy $sitename.test --cc --note="Pantheon Managed Updates: Deployed from $multidev"
+
+# Deploying staged updates from Dev to Test Step #2
+printf "\nDeploying from Dev to Test..."# Prompt the user to input the deployment message
+# WordPress Core
+printf "Enter the WordPress core version updated (ex. 'WordPress core has been updated from 6.4.1 to 6.4.3' or 'WordPress core was not updated'): "
+read v_message
+wpcv_message="WordPress Core: \n- $v_message"
+# Packages
+printf "Enter a list of updated plugins/themes (press Enter after each module, type 'done' when finished):\n"
+# Initialize an empty array to store the modules
+packages=()
+# Read input from the user until they type 'done'
+while true; do
+    read package
+    if [ "$package" = "done" ]; then
+        break
+    fi
+    packages+=("$package") 
+done
+# Store the list of updated modules with bullet points
+num_packages=${#packages[@]}
+pkg_message="Plugins/Themes ($num_packages):"
+for package in "${packages[@]}"; do
+    pkg_message+="\n- $package"
+done
+sleep 0.5
+
+head_message="Pantheon Managed Updates: Deployed from $multidev"
+deploy_message="$head_message\n\n$wpcv_message\n\n$pkg_message"
+
+terminus env:deploy $sitename.test --cc --note="$deploy_message"
 echo "Done!"
 echo "Visit the site here: https://test-$sitename.pantheonsite.io"
 # Prompt the user to press any key to continue
@@ -346,7 +375,7 @@ read -n 1 -s
 
 # Deploying staged updates from Test to Live
 echo "Deploying from Test to Live..."
-terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deployed from $multidev"
+terminus env:deploy $sitename.live --cc --note="$deploy_message"
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
 printf "Successfully deployed the updates to Live!\n"

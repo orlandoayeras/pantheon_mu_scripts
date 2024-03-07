@@ -256,7 +256,7 @@ echo "If every pages passed, press any key to continue..."
 read -n 1 -s
 '
 
-# Deploying staged updates from Dev to Test
+# Deploying staged updates from Dev to Test Step #1
 # terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
 while true; do
     read -p "Do you want to sync the content from Live to Test? [y,n] " yn
@@ -271,11 +271,11 @@ while true; do
     esac
 done
 
-# Deploying staged updates from Dev to Test
+# Deploying staged updates from Dev to Test Step #2
 printf "\nDeploying from Dev to Test..."
 # Prompt the user to input the deployment message
 # Drupal Core
-printf "Enter the Drupal core version updated (ex. 'Drupal core was updated from 9.5.9 to 9.5.11' or 'Drupal core was not updated'): "
+printf "Enter the Drupal core version updated (ex. 'Drupal core has been updated from 9.5.9 to 9.5.11' or 'Drupal core was not updated'): "
 read v_message
 dcv_message="Drupal Core: \n- $v_message"
 # Packages
@@ -379,7 +379,7 @@ read -n 1 -s
 sleep 0.5
 # Deploying staged updates from Test to Live
 printf "\nDeploying from Test to Live..."
-terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deploying from $multidev" --updatedb
+terminus env:deploy $sitename.live --cc --note="$deploy_message" --updatedb
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
 echo "Press any key to exit the script..."

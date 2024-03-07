@@ -277,7 +277,8 @@ printf "\nDeploying from Dev to Test..."
 # WordPress Core
 printf "\nEnter the WordPress core version updated (ex. 'WordPress core has been updated from 6.4.1 to 6.4.3' or 'WordPress core was not updated'): \n"
 read v_message
-wpcv_message="WordPress Core: \n- $v_message"
+wpcv_message="WordPress Core:
+- $v_message"
 # Packages
 printf "Enter a list of updated plugins/themes (press Enter after each module, type 'done' when finished):\n"
 # Initialize an empty array to store the modules
@@ -299,7 +300,11 @@ done
 sleep 0.5
 
 head_message="Pantheon Managed Updates: Deployed from $multidev"
-deploy_message="$head_message\n\n$wpcv_message\n\n$pkg_message"
+deploy_message="$head_message
+
+$wpcv_message
+
+$pkg_message"
 
 terminus env:deploy $sitename.test --cc --note="$deploy_message"
 echo "Done!"

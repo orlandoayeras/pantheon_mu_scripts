@@ -279,7 +279,8 @@ printf "\nDeploying from Dev to Test..."
 # Drupal Core
 printf "Enter the Drupal core version updated (ex. 'Drupal core has been updated from 9.5.9 to 9.5.11' or 'Drupal core was not updated'): \n"
 read v_message
-dcv_message="Drupal Core: \n- $v_message"
+dcv_message="Drupal Core:
+- $v_message"
 # Packages
 printf "Enter a list of updated modules/themes (press Enter after each module, type 'done' when finished):\n"
 # Initialize an empty array to store the modules
@@ -296,12 +297,16 @@ done
 num_packages=${#packages[@]}
 pkg_message="Modules/Themes ($num_packages):"
 for package in "${packages[@]}"; do
-    pkg_message+="\n- $package"
+    pkg_message+=$'\n'"- $package"
 done
 sleep 0.5
 
-head_message="Pantheon Managed Updates: Deployed from $multidev"
-deploy_message="$head_message\n\n$dcv_message\n\n$pkg_message"
+head_message="Pantheon Managed Updates - Deployed from $multidev"
+deploy_message="$head_message
+
+$dcv_message
+
+$pkg_message"
 
 terminus env:deploy $sitename.test --cc --note="$deploy_message" --updatedb
 echo "Done!"

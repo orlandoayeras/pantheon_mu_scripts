@@ -65,6 +65,7 @@ while true; do
     read -p "Do you want to proceed with the deployment? [y,n] " yn
     case $yn in
         [Yy]* ) echo "Proceeding the creation of Snapshot Environments...";
+                sleep 0.5
                 while true; do
                     read -p "Are Snapshot Environments already created? [y,n] " yn
                     case $yn in
@@ -160,7 +161,7 @@ sleep 1
 while true; do
     read -p "Do you want to merge new commits from Dev to multidev [y,n] " yn
     case $yn in
-        [Yy]* ) echo -e "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
+        [Yy]* ) echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
         terminus multidev:merge-from-dev -- "$sitename.$multidev"
         echo "\nMerging commits from multidev $multidev to Dev..."
         terminus multidev:merge-to-dev "$sitename.$multidev"
@@ -264,15 +265,17 @@ while true; do
                 echo "Done! Proceeding on the next step..."
                 break;;
         [Nn]* ) echo "Proceeding on the next step..."
+                sleep 0.5
                 break;;
         * ) echo "Please answer yes[y] or no[n]. ";;
     esac
 done
 
 # Deploying staged updates from Dev to Test Step #2
-printf "\nDeploying from Dev to Test..."# Prompt the user to input the deployment message
+printf "\nDeploying from Dev to Test..."
+# Prompt the user to input the deployment message
 # WordPress Core
-printf "Enter the WordPress core version updated (ex. 'WordPress core has been updated from 6.4.1 to 6.4.3' or 'WordPress core was not updated'): "
+printf "\nEnter the WordPress core version updated (ex. 'WordPress core has been updated from 6.4.1 to 6.4.3' or 'WordPress core was not updated'): \n"
 read v_message
 wpcv_message="WordPress Core: \n- $v_message"
 # Packages
@@ -326,7 +329,7 @@ declare -a labels
 declare -a paths
 
 while true; do
-    read -p "Enter a label for the page (or press Enter to finish): " label
+    read -p "Enter a label for the page [or press Enter to finish]: " label
     if [ -z "$label" ]; then
         break
     fi
@@ -403,7 +406,7 @@ declare -a labels
 declare -a paths
 
 while true; do
-    read -p "Enter a label for the page (or press Enter to finish): " label
+    read -p "Enter a label for the page [or press Enter to finish]: " label
     if [ -z "$label" ]; then
         break
     fi

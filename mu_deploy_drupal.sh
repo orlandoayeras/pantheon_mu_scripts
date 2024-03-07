@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Check if PMU-ops is loggend in the Terminus
 who_ami=$(terminus whoami)
@@ -59,132 +59,137 @@ for multidev in $environments; do
   fi
 done
 
+
+# Prompt the user to select the action to be performed and ask for Snapshot Environments creation
 while true; do
-    read -p "Do you want to proceed the deployment? [y,n] " yn
+    read -p "Do you want to proceed with the deployment? [y,n] " yn
     case $yn in
-        [Yy]* ) echo "Waking up $multidev environment..."
-        terminus env:wake "$sitename.$multidev";
-        echo "Done!"
-        sleep 1
-        echo "Updating the database of $multidev..."
-        terminus drush "$sitename.$multidev" -- updatedb -y
-        echo "Done, updating the database!"
+        [Yy]* ) echo "Proceeding the creation of Snapshot Environments...";
+                while true; do
+                    read -p "Are Snapshot Environments already created? [y,n] " yn
+                    case $yn in
+                        [Nn]* ) echo "Proceeding the creation of Snapshot Environments...";
+                                # CREATE SNAPSHOT ENVIRONMENTS FOR DEV, TEST, AND LIVE
+                                # Define the pattern for DEV multidev environment
+                                pattern1="^snpd-[0-9]{6}$"
+                                # The machine name will be put here $sitename for the multidev environments
+                                environments=$(terminus multidev:list "$sitename" --format=list --field=id)
+                                # Loop through the multidev environments
+                                for multidevd in $environments; do
+                                  # Check if the environment name matches the pattern1
+                                  if [[ $multidevd =~ $pattern1 ]]; then
+                                    # Delete the multidev environment
+                                    terminus multidev:delete --delete-branch "$sitename.$multidevd" -y
+                                    echo "Deleted Dev Snapshot Environment: $multidevd"
+                                    # Exit the loop since the correct environment has been found
+                                    break
+                                  fi
+                                done
+                                cur_date=$(TZ="PST8PDT" date +'%y%m%d')
+                                terminus multidev:create $sitename.dev snpd-$cur_date
+                                echo "Created Dev Snapshot Environment: snpd-$cur_date"
+                                sleep 1
+
+                                # Define the pattern for TEST multidev environment
+                                pattern1="^snpt-[0-9]{6}$"
+                                # The machine name will be put here $sitename for the multidev environments
+                                environments=$(terminus multidev:list "$sitename" --format=list --field=id)
+                                # Loop through the multidev environments
+                                for multidevt in $environments; do
+                                  # Check if the environment name matches the pattern1
+                                  if [[ $multidevt =~ $pattern1 ]]; then
+                                    # Delete the multidev environment
+                                    terminus multidev:delete --delete-branch "$sitename.$multidevt" -y
+                                    echo "Deleted Test Snapshot Environment: $multidevt"
+                                    # Exit the loop since the correct environment has been found
+                                    break
+                                  fi
+                                done
+                                terminus multidev:create $sitename.test snpt-$cur_date
+                                echo "Created Test Snapshot Environment: snpt-$cur_date"
+                                sleep 1
+
+
+                                # Define the pattern for LIVE multidev environment
+                                pattern1="^snpl-[0-9]{6}$"
+
+                                # The machine name will be put here $sitename for the multidev environments
+                                environments=$(terminus multidev:list "$sitename" --format=list --field=id)
+
+                                # Loop through the multidev environments
+                                for multidevl in $environments; do
+                                  # Check if the environment name matches the pattern1
+                                  if [[ $multidevl =~ $pattern1 ]]; then
+                                    # Delete the multidev environment
+                                    terminus multidev:delete --delete-branch "$sitename.$multidevl" -y
+                                    echo "Deleted Live Snapshot Environment: $multidevl"
+                                    # Exit the loop since the correct environment has been found
+                                    break
+                                  fi
+                                done
+                                terminus multidev:create $sitename.live snpl-$cur_date
+                                echo "Created Live Snapshot Environment: snpl-$cur_date"
+                                sleep 1
+                                break;;
+                        [Yy]* ) echo "Moving to deployment..."
+                                break;;
+                        * ) echo "Please answer yes[y] or no[n]. ";;
+                    esac
+                done
         break;;
         [Nn]* ) echo "Exiting..."
         exit;;
-        * ) echo "Please answer yes(y) or no(n). ";;
+        * ) echo "Please answer yes[y] or no[n]. ";;
     esac
 done
 sleep 1.5
 
-
-
-# CREATE SNAPSHOT ENVIRONMENTS FOR DEV, TEST, AND LIVE
-# Define the pattern for DEV multidev environment
-pattern1="^snpd-[0-9]{6}$"
-
-# The machine name will be put here $sitename for the multidev environments
-environments=$(terminus multidev:list "$sitename" --format=list --field=id)
-
-# Loop through the multidev environments
-for multidevd in $environments; do
-  # Check if the environment name matches the pattern1
-  if [[ $multidevd =~ $pattern1 ]]; then
-    # Delete the multidev environment
-    terminus multidev:delete --delete-branch $sitename.$multidevd -y
-    echo "Deleted Dev Snapshot Environment: $multidevd"
-    # Exit the loop since the correct environment has been found
-    break
-  fi
-done
-cur_date=$(TZ="PST8PDT" date +'%y%m%d')
-terminus multidev:create $sitename.dev snpd-$cur_date
-echo "Created Dev Snapshot Environment: snpd-$cur_date"
-sleep 1
-
-
-# Define the pattern for TEST multidev environment
-pattern1="^snpt-[0-9]{6}$"
-
-# The machine name will be put here $sitename for the multidev environments
-environments=$(terminus multidev:list "$sitename" --format=list --field=id)
-
-# Loop through the multidev environments
-for multidevt in $environments; do
-  # Check if the environment name matches the pattern1
-  if [[ $multidevt =~ $pattern1 ]]; then
-    # Delete the multidev environment
-    terminus multidev:delete --delete-branch $sitename.$multidevt -y
-    echo "Deleted Test Snapshot Environment: $multidevt"
-    # Exit the loop since the correct environment has been found
-    break
-  fi
-done
-terminus multidev:create $sitename.test snpt-$cur_date
-echo "Created Test Snapshot Environment: snpt-$cur_date"
-sleep 1
-
-
-# Define the pattern for LIVE multidev environment
-pattern1="^snpl-[0-9]{6}$"
-
-# The machine name will be put here $sitename for the multidev environments
-environments=$(terminus multidev:list "$sitename" --format=list --field=id)
-
-# Loop through the multidev environments
-for multidevl in $environments; do
-  # Check if the environment name matches the pattern1
-  if [[ $multidevl =~ $pattern1 ]]; then
-    # Delete the multidev environment
-    terminus multidev:delete --delete-branch $sitename.$multidevl -y
-    echo "Deleted Live Snapshot Environment: $multidevl"
-    # Exit the loop since the correct environment has been found
-    break
-  fi
-done
-terminus multidev:create $sitename.live snpl-$cur_date
-echo "Created Live Snapshot Environment: snpl-$cur_date"
-sleep 1
 
 # Pre-deployment prompt for available commits ready to merge from DEV to multidev
-echo "Pull the site's dashboard. Please check for any available updates through the dashboard...."
-terminus dashboard:view --print $sitename.dev 
-echo "Dev's dashboard: https://admin.dashboard.pantheon.io/
-while true; do
-    read -p "Do you want to merge new commits from Dev to multidev [y,n] " yn
-    case $yn in
-        [Yy]* ) echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
-        terminus multidev:merge-from-dev -- $sitename.$multidev
-        echo "Updating the database..."
-        terminus drush "$sitename.$multidev" -- updatedb -y
-        echo "Done, updating the database!"
-        echo "\nMerging commits from multidev $multidev to Dev..."
-        terminus multidev:merge-to-dev $sitename.$multidev
-        echo "Updating the database..."
-        terminus drush "$sitename.$multidev" -- updatedb -y
-        terminus env:clear-cache "$sitename.dev"
-        echo "Done, updating the database!"
-        echo "Done!"
-        echo "Visit the site here: https://dev-$sitename.pantheonsite.io" 
-        break;;
-        [Nn]* ) echo "\nMerging commits from multidev $multidev to Dev..."
-        terminus multidev:merge-to-dev $sitename.$multidev
-        terminus env:clear-cache "$sitename.dev"
-        echo "Done!"
-        echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
-        exit;;
-        * ) echo "Please answer yes(y) or no(n). ";;
-    esac
-done
-sleep 1.5
-
-
+echo "Pulling the site's dashboard. Please check for any available updates through the dashboard...."
+terminus dashboard:view --print $sitename.dev
 # Prompt the user to press any key to continue
 echo "Press any key to continue..."
 read -n 1 -s
 
 
+echo "Waking up $multidev environment..."
+terminus env:wake "$sitename.$multidev";
+echo "Done!"
+sleep 1
+while true; do
+    read -p "Do you want to merge new commits from Dev to multidev [y,n] " yn
+    case $yn in
+        [Yy]* ) echo -e "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
+        terminus multidev:merge-from-dev -- "$sitename.$multidev"
+        terminus drush "$sitename.$multidev" -- updb -y
+        echo "\nMerging commits from multidev $multidev to Dev..."
+        terminus multidev:merge-to-dev "$sitename.$multidev"
+        echo "Updated database..."
+        terminus drush "$sitename.dev" -- updb -y
+        echo "Clearing caches..."
+        terminus env:clear-cache "$sitename.dev"
+        echo "Done, cleared the caches!"
+        echo "Visit the site here: https://dev-$sitename.pantheonsite.io" 
+        break;;
+        [Nn]* ) echo "Proceeding on the next step..."
+        break;;
+        *) echo "Please answer yes or no. "
+        ;;
+    esac
+done
 
+echo "\nMerging commits from multidev $multidev to Dev..."
+terminus multidev:merge-to-dev "$sitename.$multidev"
+terminus env:clear-cache "$sitename.dev"
+echo "Done!"
+echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
+
+# Prompt the user to press any key to continue
+echo "Press any key to continue on deployment..."
+read -n 1 -s
+
+: '
 # CREATING A VRT YAML FILE FOR SNPD AGAINST DEV
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -199,6 +204,97 @@ output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml/" # Replace 
 
 # Define the YAML file name
 output_file="$output_directory/$sitename-dev.yml"
+
+# Prompt the user to input labels and paths for tests
+declare -a labels
+declare -a paths
+
+while true; do
+    read -p -r "Enter a label for the page (or press Enter to finish): " label
+    if [ -z "$label" ]; then
+        break
+    fi
+    read -p "Enter the path for the page: " path
+    labels+=("$label")
+    paths+=("$path")
+done
+
+
+cat <<EOF > "$output_file"
+site_uid: "$site_uuid"
+org_uid: "$org_uuid"
+reference_url: "$reference_url"
+subject_url: "$subject_url"
+tests:
+  - label: "Home"
+    path: "/"
+    threshold: 0.8
+    delay: 5
+    follows_redirect: true
+EOF
+
+# Add the user-inputted labels and paths to the YAML file
+for ((i=0; i<${#labels[@]}; i++)); do
+    cat <<EOF >> "$output_file"
+  - label: "${labels[i]}"
+    path: "${paths[i]}"
+    threshold: 0.8
+    delay: 5
+    follows_redirect: true
+EOF
+done
+
+echo "Generated values saved to $output_file"
+
+sleep 1.5
+# Run the VRT
+terminus env:wake $sitename.snpd-$cur_date
+terminus env:wake $sitename.dev
+terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-dev.yml # Replace this with your own directory
+sleep 1.5
+echo "If every pages passed, press any key to continue..."
+read -n 1 -s
+'
+
+# Deploying staged updates from Dev to Test
+# terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
+while true; do
+    read -p "Do you want to sync the content from Live to Test? [y,n] " yn
+    case $yn in
+        [Yy]* ) echo "Syncing the content from Live to Test..."
+                terminus env:clone-content $sitename.live test --updatedb -y
+                echo "Done! Proceeding on the next step..."
+                break;;
+        [Nn]* ) echo "Proceeding on the next step..."
+                break;;
+        * ) echo "Please answer yes[y] or no[n]. ";;
+    esac
+done
+
+# Deploying staged updates from Dev to Test
+printf "\nDeploying from Dev to Test..."
+terminus env:deploy $sitename.test --cc --note="Pantheon Managed Updates: Deployed from $multidev" --updatedb
+echo "Done!"
+echo "Visit the site here: https://test-$sitename.pantheonsite.io"
+# Prompt the user to press any key to continue
+echo "Press any key to continue on deployment.."
+read -n 1 -s
+
+: '
+# CREATING A VRT YAML FILE FOR SNPT AGAINST TEST
+site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
+site_uuid=$(echo "$site_info" | jq -r '.id')
+org_uuid=$(echo $site_info | jq -r '.organization')
+
+reference_url="https://snpt-$cur_date-$sitename.pantheonsite.io"
+subject_url="https://test-$sitename.pantheonsite.io"
+
+
+# Define the directory where you want to save the YAML file
+output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml/" # Replace this with your own directory
+
+# Define the YAML file name
+output_file="$output_directory/$sitename-test.yml"
 
 # Prompt the user to input labels and paths for tests
 declare -a labels
@@ -243,103 +339,25 @@ echo "Generated values saved to $output_file"
 
 sleep 1.5
 # Run the VRT
-terminus env:wake $sitename.snpd-$cur_date
-terminus env:wake $sitename.dev
-terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-dev.yml # Replace this with your own directory
-sleep 1.5
-echo "If every pages passed, press any key to continue..."
-read -n 1 -s
-
-
-sleep 0.5
-# Deploying staged updates from Dev to Test
-# terminus env:deploy $sitename.test --sync-content --cc --note="Managed Updates: Deploying from Dev to Test"
-while true; do
-    read -p "Do you want to sync the content from Live to Test? [y,n] " yn
-    case $yn in
-        [Yy]* ) echo "Syncing the content from Live to Test..."
-                terminus env:clone-content $sitename.live test --updatedb -y
-                echo "Done! Proceeding on the next step..."
-                break;;
-        [Nn]* ) echo "Proceeding on the next step..."
-                break;;
-        * ) echo "Please answer yes(y) or no(n). ";;
-    esac
-done
-
-sleep 0.5
-echo "\nDeploying from Dev to Test..."
-terminus env:deploy $sitename.test --cc --note="Pantheon Managed Updates: Deployed from $multidev" --updatedb
-echo "Done!"
-echo "Visit the site here: https://test-$sitename.pantheonsite.io"
-# Prompt the user to press any key to continue
-echo "Press any key to continue to VRT..."
-read -n 1 -s
-
-
-# CREATING A VRT YAML FILE FOR SNPT AGAINST TEST
-site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
-site_uuid=$(echo "$site_info" | jq -r '.id')
-org_uuid=$(echo $site_info | jq -r '.organization')
-
-reference_url="https://snpt-$cur_date-$sitename.pantheonsite.io"
-subject_url="https://test-$sitename.pantheonsite.io"
-
-
-# Define the directory where you want to save the YAML file
-output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml/" # Replace this with your own directory
-
-# Define the YAML file name
-output_file="$output_directory/$sitename-test.yml"
-
-
-
-cat <<EOF > "$output_file"
-site_uid: "$site_uuid"
-org_uid: "$org_uuid"
-reference_url: "$reference_url"
-subject_url: "$subject_url"
-tests:
-  - label: "Home"
-    path: "/"
-    threshold: 0.8
-    delay: 5
-    follows_redirect: true
-EOF
-
-# Add the user-inputted labels and paths to the YAML file
-for ((i=0; i<${#labels[@]}; i++)); do
-    cat <<EOF >> "$output_file"
-  - label: "${labels[i]}"
-    path: "${paths[i]}"
-    threshold: 0.8
-    delay: 5
-    follows_redirect: true
-EOF
-done
-
-echo "Generated values saved to $output_file"
-
-sleep 1.5
-# Run the VRT
 terminus env:wake $sitename.snpt-$cur_date
 terminus env:wake $sitename.test
 terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-test.yml  # Replace this with your own directory
 sleep 1.5
 echo "If every pages passed, press any key to continue..."
 read -n 1 -s
+'
 
 
 sleep 0.5
 # Deploying staged updates from Test to Live
-echo "\nDeploying from Test to Live..."
+printf "\nDeploying from Test to Live..."
 terminus env:deploy $sitename.live --cc --note="Pantheon Managed Updates: Deploying from $multidev" --updatedb
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
-echo "Press any key to continue to VRT..."
+echo "Press any key to exit the script..."
 read -n 1 -s
 
-
+: '
 # CREATING A VRT YAML FILE FOR SNPL AGAINST LIVE
 site_info=$(terminus site:info $sitename --fields=id,organization --format=json)
 site_uuid=$(echo "$site_info" | jq -r '.id')
@@ -355,6 +373,19 @@ output_directory="/Users/dymmrobot/pantheon/mu/ap_vrt_tools/vrt_yml/" # Replace 
 # Define the YAML file name
 output_file="$output_directory/$sitename-live.yml"
 
+# Prompt the user to input labels and paths for tests
+declare -a labels
+declare -a paths
+
+while true; do
+    read -p "Enter a label for the page (or press Enter to finish): " label
+    if [ -z "$label" ]; then
+        break
+    fi
+    read -p "Enter the path for the page: " path
+    labels+=("$label")
+    paths+=("$path")
+done
 
 
 cat <<EOF > "$output_file"
@@ -391,5 +422,6 @@ terminus vrt ~/pantheon/mu/ap_vrt_tools/vrt_yml/$sitename-live.yml # Replace thi
 sleep 1.5
 echo "If every pages are pass, press any key to continue..."
 read -n 1 -s
-sleep 1
+'
+
 exit

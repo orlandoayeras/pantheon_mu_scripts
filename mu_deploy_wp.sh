@@ -59,6 +59,8 @@ for multidev in $environments; do
   fi
 done
 
+
+# Prompt the user to select the action to be performed and ask for Snapshot Environments creation
 while true; do
     read -p "Do you want to proceed with the deployment? [y,n] " yn
     case $yn in

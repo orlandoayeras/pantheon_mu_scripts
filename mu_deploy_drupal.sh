@@ -261,7 +261,7 @@ read -n 1 -s
 while true; do
     read -p "Do you want to sync the content from Live to Test? [y,n] " yn
     case $yn in
-        [Yy]* ) echo "Syncing the content from Live to Test..."
+        [Yy]* ) printf "Syncing the content from Live to Test..."
                 terminus env:clone-content $sitename.live test --updatedb -y
                 echo "Done! Proceeding on the next step..."
                 break;;
@@ -273,7 +273,35 @@ done
 
 # Deploying staged updates from Dev to Test
 printf "\nDeploying from Dev to Test..."
-terminus env:deploy $sitename.test --cc --note="Pantheon Managed Updates: Deployed from $multidev" --updatedb
+# Prompt the user to input the deployment message
+# Drupal Core
+printf "Enter the Drupal core version updated (ex. 'Drupal core was updated from 9.5.9 to 9.5.11' or 'Drupal core was not updated'): "
+read v_message
+dcv_message="Drupal Core: \n- $v_message"
+# Packages
+printf "Enter a list of updated modules/themes (press Enter after each module, type 'done' when finished):\n"
+# Initialize an empty array to store the modules
+packages=()
+# Read input from the user until they type 'done'
+while true; do
+    read package
+    if [ "$package" = "done" ]; then
+        break
+    fi
+    packages+=("$package") 
+done
+# Store the list of updated modules with bullet points
+num_packages=${#packages[@]}
+pkg_message="Modules/Themes ($num_packages):"
+for package in "${packages[@]}"; do
+    pkg_message+="\n- $package"
+done
+sleep 0.5
+
+head_message="Pantheon Managed Updates: Deployed from $multidev"
+deploy_message="$head_message\n\n$dcv_message\n\n$pkg_message"
+
+terminus env:deploy $sitename.test --cc --note="$deploy_message" --updatedb
 echo "Done!"
 echo "Visit the site here: https://test-$sitename.pantheonsite.io"
 # Prompt the user to press any key to continue

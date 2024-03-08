@@ -172,6 +172,9 @@ while true; do
         break;;
         [Nn]* ) echo "Proceeding on the next step..."
         break;;
+        [exit]* ) echo "Exiting..."
+                  sleep 1.5
+        exit;;
         *) echo "Please answer yes or no. "
         ;;
     esac

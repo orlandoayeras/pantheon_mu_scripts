@@ -159,7 +159,7 @@ terminus env:wake "$sitename.$multidev";
 echo "Done!"
 sleep 1
 while true; do
-    read -p "Do you want to merge new commits from Dev to multidev [y,n] " yn
+    read -p "Do you want to merge new commits from Dev to multidev [y,n,exit] " yn
     case $yn in
         [Yy]* ) echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
         terminus multidev:merge-from-dev -- "$sitename.$multidev"
@@ -175,6 +175,9 @@ while true; do
         break;;
         [Nn]* ) echo "Proceeding on the next step..."
         break;;
+        [exit]* ) echo "Exiting..."
+                  sleep 1.5
+        exit;;
         *) echo "Please answer yes or no. "
         ;;
     esac
@@ -277,7 +280,7 @@ done
 printf "\nDeploying from Dev to Test..."
 # Prompt the user to input the deployment message
 # Drupal Core
-printf "Enter the Drupal core version updated (ex. 'Drupal core has been updated from 9.5.9 to 9.5.11' or 'Drupal core was not updated'): \n"
+printf "\nEnter the Drupal core version updated (ex. 'Drupal core has been updated from 9.5.9 to 9.5.11' or 'Drupal core was not updated'): \n"
 read v_message
 dcv_message="Drupal Core:
 - $v_message"

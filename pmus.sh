@@ -2,11 +2,13 @@
 
 deploy_drupal_site() {
     echo "Running Drupal script..."
+    sleep 1
     ./mu_deploy_drupal.sh  # The actual path to for Drupal script
 }
 
 deploy_wp_site() {
     echo "Running WordPress script..."
+    sleep 1
     ./mu_deploy_wp.sh  # The actual path to for WordPress script
 }
 

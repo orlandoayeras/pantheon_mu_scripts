@@ -17,7 +17,7 @@ sleep 2
 clear
 
 # Pulling site's machine name
-echo "\nThis is a script for Drupal MU Deployment...\n"
+printf "\nThis is a script for Drupal MU Deployment...\n"
 echo "Please type-in the machine name of the Pantheon site: "
 read sitename
 # echo "Please type-in the environment name of the source: "

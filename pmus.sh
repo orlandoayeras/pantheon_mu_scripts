@@ -1,12 +1,12 @@
 #!/bin/bash
 
 deploy_drupal_site() {
-    echo "Deploying Drupal site..."
+    echo "Running Drupal script..."
     ./mu_deploy_drupal.sh  # The actual path to for Drupal script
 }
 
 deploy_wp_site() {
-    echo "Deploying WordPress site..."
+    echo "Running WordPress script..."
     ./mu_deploy_wp.sh  # The actual path to for WordPress script
 }
 

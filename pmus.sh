@@ -23,8 +23,8 @@ display_pmus
 printf "\n\nWelcome to the Pantheon Managed Updates Script (PMUS)!\n"
 echo "This shell script tool will help you do MU processes on a Drupal or WordPress site in Pantheon."
 echo "Developed and maintained by orlandoayeras for the Pantheon MU Team."
-echo "Version: 0.3"
-printf "Date: 2024-03-13\n\n\n"
+echo "Version: 0.4"
+printf "Date: 2024-03-14\n\n\n"
 
 case "$1" in
   "update")

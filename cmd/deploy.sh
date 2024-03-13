@@ -44,7 +44,7 @@ display_pmus
 printf "\n\nWelcome to the Pantheon Managed Updates Script (PMUS)!\n"
 echo "This script will help you deploy a Drupal or WordPress site to Pantheon."
 echo "Developed and maintained by orlandoayeras for the Pantheon MU Team."
-echo "Version: 0.4"
+echo "Version: 0.4.1"
 printf "Date: 2024-03-14\n\n\n"
 
 deploy_drupal_site() {

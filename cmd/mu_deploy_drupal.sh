@@ -53,7 +53,7 @@ for multidev in $environments; do
   # Check if the environment name matches the pattern 
   if [[ $multidev =~ $pattern ]]; then
     # Display the machine name and multidev environment
-    printf "\nThe Pantheon site's machine name is $sitename and the environment is $multidev"
+    printf "\nThe Pantheon site's machine name is $sitename and the environment is $multidev\n\n"
     # Exit the loop since the correct environment has been found
     break
   fi

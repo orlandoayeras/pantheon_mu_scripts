@@ -4,7 +4,7 @@ Pantheon MU Scripts (PMUS)
 Welcome to the Pantheon Managed Updates Script
 This shell script tool will help you do MU processes on a Drupal or WordPress site in Pantheon.
 Developed and maintained by orlandoayeras for the Pantheon MU Team.
-Version: 0.2
+Version: 0.3
 Date: 2024-03-13
 
 Install via cURL

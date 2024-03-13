@@ -50,13 +50,13 @@ printf "Date: 2024-03-13\n\n\n"
 deploy_drupal_site() {
     echo "Running Drupal script..."
     sleep 1
-    ./mu_deploy_drupal.sh  # The actual path to for Drupal script
+    ~/pmus/mu_deploy_drupal.sh  # The actual path to for Drupal script
 }
 
 deploy_wp_site() {
     echo "Running WordPress script..."
     sleep 1
-    ./mu_deploy_wp.sh  # The actual path to for WordPress script
+    ~/pmus/mu_deploy_wp.sh  # The actual path to for WordPress script
 }
 exit_script() {
     echo "Exiting..."
@@ -64,7 +64,17 @@ exit_script() {
     exit 1
 }
 
-echo "Welcome! Please select an option:"
+case "$1" in
+  "update")
+    ~/pmus/cmd/update.sh
+    ;;
+  # Add more cases for other sub-commands as needed
+  *)
+    echo "Usage: {update}"
+    ;;
+esac
+
+printf "\nWelcome! Please select an option:\n"
 echo "1. Deploy a Drupal site"
 echo "2. Deploy a WordPress site"
 echo "3. Exit"

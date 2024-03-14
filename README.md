@@ -15,8 +15,8 @@
 Welcome to the Pantheon Managed Updates Script Tool
 This shell script tool will help you do MU processes on a Drupal or WordPress site in Pantheon.
 Developed and maintained by orlandoayeras for the Pantheon MU Team.
-Version: 0.4.1
-Date: 2024-03-14
+Version: 0.4.2
+Date: 2024-03-15
 ```
 
 ### Install via cURL<br />

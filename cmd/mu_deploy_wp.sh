@@ -326,8 +326,8 @@ terminus env:deploy $sitename.test --cc --note="$deploy_message"
 echo "Done!"
 echo "Visit the site here: https://test-$sitename.pantheonsite.io"
 # Prompt the user to press any key to continue
-echo "Press any key to continue on deployment.."
-read -n 1 -s
+# echo "Press any key to continue on deployment.."
+# read -n 1 -s
 
 : '
 # CREATING A VRT YAML FILE FOR SNPT AGAINST TEST
@@ -403,7 +403,7 @@ terminus env:deploy $sitename.live --cc --note="$deploy_message"
 echo "Done!"
 echo "Visit the site here: https://live-$sitename.pantheonsite.io"
 printf "Successfully deployed the updates to Live!\n"
-echo "Press any key to continue exit..."
+echo "Press any key to exit..."
 read -n 1 -s
 
 : '

@@ -23,18 +23,21 @@ display_pmus
 printf "\n\nWelcome to the Pantheon Managed Updates Script (PMUS)!\n"
 echo "This shell script tool will help you do MU processes on a Drupal or WordPress site in Pantheon."
 echo "Developed and maintained by orlandoayeras for the Pantheon MU Team."
-echo "Version: 0.4.1"
-printf "Date: 2024-03-14\n\n\n"
+echo "Version: 0.4.2"
+printf "Date: 2024-03-15\n\n\n"
 
 case "$1" in
   "update")
     ~/.pmus/cmd/update.sh
     ;;
-   "deploy")
+  "deploy")
     ~/.pmus/cmd/deploy.sh
     ;;
-    "mdev")
+  "mdev")
     ~/.pmus/cmd/del_multidev.sh
+    ;;
+  "snapshot")
+    ~/.pmus/cmd/snapshot_env.sh
     ;;
   # Add more cases for other sub-commands as needed
   *)
@@ -44,6 +47,7 @@ case "$1" in
     - update          Update the pmus version
     - deploy          Deploy a Drupal or WordPress site to Pantheon
     - mdev            Delete and create a mu-yymmdd multidev environment in Pantheon
+    - snapshot        Create snapshot environments for Dev, Test, and Live in Pantheon
     "
     ;;
 esac

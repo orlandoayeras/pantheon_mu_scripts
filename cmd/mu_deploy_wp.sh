@@ -67,9 +67,9 @@ while true; do
         [Yy]* ) echo "Proceeding the creation of Snapshot Environments...";
                 sleep 0.5
                 while true; do
-                    read -p "Are Snapshot Environments already created? [y,n] " yn
+                    read -p "Do you want to create Snapshot environments? [y,n] " yn
                     case $yn in
-                        [Nn]* ) echo "Proceeding the creation of Snapshot Environments...";
+                        [Yy]* ) echo "Proceeding the creation of Snapshot Environments...";
                                 # CREATE SNAPSHOT ENVIRONMENTS FOR DEV, TEST, AND LIVE
                                 # Define the pattern for DEV multidev environment
                                 pattern1="^snpd-[0-9]{6}$"
@@ -132,7 +132,7 @@ while true; do
                                 echo "Created Live Snapshot Environment: snpl-$cur_date"
                                 sleep 1
                                 break;;
-                        [Yy]* ) echo "Moving to deployment..."
+                        [Nn]* ) echo "Moving to deployment..."
                                 break;;
                         * ) echo "Please answer yes[y] or no[n]. ";;
                     esac
@@ -154,18 +154,13 @@ echo "Press any key to continue..."
 read -n 1 -s
 
 devtomdev() {
+  echo "Merging commits from Dev to multidev $multidev..."
   terminus multidev:merge-from-dev -- "$sitename.$multidev"
-  echo "\nMerging commits from multidev $multidev to Dev..."
-  terminus multidev:merge-to-dev "$sitename.$multidev"
-  echo "Clearing caches..."
-  terminus env:clear-cache "$sitename.dev"
-  echo "Done, cleared the caches!"
-  echo "Visit the site here: https://dev-$sitename.pantheonsite.io" 
   return
 }
 
 mdevtodev() {
-  echo "\nMerging commits from multidev $multidev to Dev..."
+  printf "Merging commits from multidev $multidev to Dev...\n"
   terminus multidev:merge-to-dev "$sitename.$multidev"
   terminus env:clear-cache "$sitename.dev"
   echo "Done!"

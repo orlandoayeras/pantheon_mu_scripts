@@ -155,16 +155,10 @@ echo "Press any key to continue..."
 read -n 1 -s
 
 devtomdev(){
+  echo "Merging commits from Dev to multidev $multidev..."
   terminus multidev:merge-from-dev -- "$sitename.$multidev"
   terminus drush "$sitename.$multidev" -- updb -y
-  echo "\nMerging commits from multidev $multidev to Dev..."
-  terminus multidev:merge-to-dev "$sitename.$multidev"
-  echo "Updated database..."
-  terminus drush "$sitename.dev" -- updb -y
-  echo "Clearing caches..."
-  terminus env:clear-cache "$sitename.dev"
-  echo "Done, cleared the caches!"
-  echo "Visit the site here: https://dev-$sitename.pantheonsite.io"
+  return
 }
 mdevtodev(){
   echo "\nMerging commits from multidev $multidev to Dev..."
@@ -187,12 +181,12 @@ sleep 1
 while true; do
     read -p "Do you want to merge new commits from Dev to multidev [y,n,skip,exit] " yn
     case $yn in
-        [Yy]* ) echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
-                devtomdev
-                mdevtodev
+        [Yy]* )   echo "\nMaking sure that new commits from Dev are merge to multidev $multidev..."
+                  devtomdev
+                  mdevtodev
         break;;
-        [Nn]* ) echo "Proceeding on the next step..."
-                echo $mdevtodev
+        [Nn]* )   echo "Proceeding on the next step..."
+                  mdevtodev
         break;;
         [skip]* ) echo "Skipping to Test..."
                   sleep 1
